@@ -1,8 +1,7 @@
-﻿namespace SicarioPatch.Integration
+﻿namespace SicarioPatch.Integration;
+
+public interface IGameSource
 {
-    public interface IGameSource
-    {
-        string? GetGamePath();
-        string? GetGamePakPath();
-    }
+    string? GetGamePath();
+    string? GetGamePakPath();
 }

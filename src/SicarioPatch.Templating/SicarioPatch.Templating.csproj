@@ -1,22 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <DebugType>Embedded</DebugType>
         <IsPackable>false</IsPackable>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <PackageReference Include="ModEngine.Core" Version="0.0.0-preview.0.9" />
-        <PackageReference Include="ModEngine.Templating" Version="0.0.0-preview.0.9" />
-<!--        <ProjectReference Include="../../../ModEngine/src/ModEngine.Templating/ModEngine.Templating.csproj" />-->
-<!--        <ProjectReference Include="../../../ModEngine/src/ModEngine.Core/ModEngine.Core.csproj" />-->
-        <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj" />
+        <PackageReference Include="ModEngine.Core" Version="0.0.0-preview.0.9"/>
+        <PackageReference Include="ModEngine.Templating" Version="0.0.0-preview.0.9"/>
+        <!--        <ProjectReference Include="../../../ModEngine/src/ModEngine.Templating/ModEngine.Templating.csproj" />-->
+        <!--        <ProjectReference Include="../../../ModEngine/src/ModEngine.Core/ModEngine.Core.csproj" />-->
+        <ProjectReference Include="..\SicarioPatch.Core\SicarioPatch.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Fluid.Core" Version="2.0.13" />
-<!--        <PackageReference Include="ModEngine.Core" Version="0.0.0-preview.0.3" />-->
+        <PackageReference Include="Fluid.Core" Version="2.4.0" />
+        <!--        <PackageReference Include="ModEngine.Core" Version="0.0.0-preview.0.3" />-->
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="JetBrains.Annotations">
+            <HintPath>..\..\..\..\.nuget\packages\jetbrains.annotations\2023.2.0\lib\netstandard2.0\JetBrains.Annotations.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

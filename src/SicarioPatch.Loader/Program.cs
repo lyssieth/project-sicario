@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace SicarioPatch.Loader
+namespace SicarioPatch.Loader;
+
+file static class Program
 {
-    class Program
+    private static Task<int> Main(string[] args)
     {
-        static Task<int> Main(string[] args) {
-            return Startup.GetApp().RunAsync(args);
-        }
+        return Startup.GetApp().RunAsync(args);
     }
 }

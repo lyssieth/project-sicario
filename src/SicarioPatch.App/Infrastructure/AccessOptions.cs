@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace SicarioPatch.App.Infrastructure
-{
-    public class AccessOptions
-    {
-        public List<string> AllowedUsers { get; set; } = new List<string>();
+namespace SicarioPatch.App.Infrastructure;
 
-        public List<string> AllowedUploaders { get; set; } = new List<string>();
-    }
+public sealed class AccessOptions
+{
+    public List<string> AllowedUsers { get; set; } = new();
+
+    public List<string> AllowedUploaders { get; set; } = new();
 }

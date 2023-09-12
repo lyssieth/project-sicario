@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SicarioPatch.Engine", "Sica
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SicarioPatch.Engine.Tests", "SicarioPatch.Engine.Tests\SicarioPatch.Engine.Tests.csproj", "{CBC2D57F-750B-4B24-BAA6-E2906827ABF3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UAssetAPI", "..\lib\UAssetAPI\UAssetAPI.csproj", "{460D48F8-1BDC-4A0F-B595-3586D71DD403}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,5 +130,17 @@ Global
 		{CBC2D57F-750B-4B24-BAA6-E2906827ABF3}.Release|x64.Build.0 = Release|Any CPU
 		{CBC2D57F-750B-4B24-BAA6-E2906827ABF3}.Release|x86.ActiveCfg = Release|Any CPU
 		{CBC2D57F-750B-4B24-BAA6-E2906827ABF3}.Release|x86.Build.0 = Release|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Debug|x64.Build.0 = Debug|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Debug|x86.Build.0 = Debug|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Release|Any CPU.Build.0 = Release|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Release|x64.ActiveCfg = Release|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Release|x64.Build.0 = Release|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Release|x86.ActiveCfg = Release|Any CPU
+		{460D48F8-1BDC-4A0F-B595-3586D71DD403}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

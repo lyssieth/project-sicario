@@ -363,3 +363,6 @@ FodyWeavers.xsd
 
 tools/**
 dist/**
+
+# .idea because I'm a Rider user
+.idea

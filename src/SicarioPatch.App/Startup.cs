@@ -19,114 +19,105 @@ using SicarioPatch.Core;
 using SicarioPatch.Engine;
 using SicarioPatch.Templating;
 
-namespace SicarioPatch.App
+namespace SicarioPatch.App;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        Configuration = configuration;
+    }
 
-        public IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMediatR(
-                mc => mc.AsScoped(),
-                typeof(Startup), typeof(PatchRequest))
-                .AddBehaviours()
-                .AddPatchBehaviour<SignatureFileBehaviour>();
-            services
-                .AddLogging()
-                .AddConfigOptions()
-                .AddBrandProvider()
-                .AddTemplating()
-                .AddConfigTemplating()
-                .AddSingleton<IBuildLog, FileBuildLog>()
-                .AddSingleton<ModParser>()
-                .Configure<ForwardedHeadersOptions>(opts =>
+    // This method gets called by the runtime. Use this method to add services to the container.
+    // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMediatR(static mc =>
             {
-                opts.ForwardedHeaders = ForwardedHeaders.All;
-            });
-            
-            services
-                .AddSingleton<WingmanPatchServiceBuilder>()
-                .AddSingleton<ISourceFileService, SourceFileService>()
-                .AddSingleton<FilePatcher>()
-                .AddSingleton<ModFileLoader<WingmanMod>>()
-                .AddSingleton<IModLoader<WingmanMod>, WingmanModLoader>()
-                .AddSingleton<WingmanModLoader>()
-                .AddSingleton<DirectoryBuildContextFactory>()
-                .AddSingleton<IAppInfoProvider, AppInfoProvider>()
-                .AddSingleton<AppInfoProvider>()
-                .AddSingleton<IModBuilder, PythonPackScript>()
-                .AddAssetServices()
-                .AddSingleton<IEngineInfoProvider, ConfigurationEngineInfoProvider>()
-                ;
-            if (Configuration.GetSection("Discord") is var discordOpts && discordOpts.Exists())
-            {
-                services.AddAuthentication(opts =>
-                    {
-                        opts.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    })
-                    .AddCookie()
-                    .AddDiscord(Configuration.GetSection("Discord"));
-            }
-            if (Configuration.GetSection("Access") is var accessOpts && accessOpts.Exists())
-            {
-                services.AddAuthHandlers(accessOpts);    
-            }
-            services.AddBlazorise(opts =>
+                mc.Lifetime = ServiceLifetime.Scoped;
+                mc.RegisterServicesFromAssemblyContaining<Startup>();
+                mc.RegisterServicesFromAssemblyContaining<PatchRequest>();
+            })
+            .AddBehaviours()
+            .AddPatchBehaviour<SignatureFileBehaviour>();
+        services
+            .AddLogging()
+            .AddConfigOptions()
+            .AddBrandProvider()
+            .AddTemplating()
+            .AddConfigTemplating()
+            .AddSingleton<IBuildLog, FileBuildLog>()
+            .AddSingleton<ModParser>()
+            .Configure<ForwardedHeadersOptions>(opts => { opts.ForwardedHeaders = ForwardedHeaders.All; });
+
+        services
+            .AddSingleton<WingmanPatchServiceBuilder>()
+            .AddSingleton<ISourceFileService, SourceFileService>()
+            .AddSingleton<FilePatcher>()
+            .AddSingleton<ModFileLoader<WingmanMod>>()
+            .AddSingleton<IModLoader<WingmanMod>, WingmanModLoader>()
+            .AddSingleton<WingmanModLoader>()
+            .AddSingleton<DirectoryBuildContextFactory>()
+            .AddSingleton<IAppInfoProvider, AppInfoProvider>()
+            .AddSingleton<AppInfoProvider>()
+            .AddSingleton<IModBuilder, PythonPackScript>()
+            .AddAssetServices()
+            .AddSingleton<IEngineInfoProvider, ConfigurationEngineInfoProvider>()
+            ;
+        if (Configuration.GetSection("Discord") is var discordOpts && discordOpts.Exists())
+            services.AddAuthentication(opts =>
                 {
-                    opts.DelayTextOnKeyPress = true;
-                    opts.ChangeTextOnKeyPress = true;
+                    opts.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
-                .AddMaterialProviders()
-                .AddMaterialIcons();
-            services.AddControllers();
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
-            
-        }
+                .AddCookie()
+                .AddDiscord(Configuration.GetSection("Discord"));
+        if (Configuration.GetSection("Access") is var accessOpts && accessOpts.Exists())
+            services.AddAuthHandlers(accessOpts);
+        services.AddBlazorise(opts =>
+            {
+                opts.Debounce = true;
+                opts.Immediate = true;
+            })
+            .AddMaterialProviders()
+            .AddMaterialIcons();
+        services.AddControllers();
+        services.AddRazorPages();
+        services.AddServerSideBlazor();
+    }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseForwardedHeaders();
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                //app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-            if (Configuration.GetDocsPath(out var _))
-            {
-                app.UseDefaultFiles();
-            }
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            // app.ApplicationServices.UseMaterialProviders().UseMaterialIcons();
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapBlazorHub();
-                // endpoints.MapSchema("/schema");
-                endpoints.MapFallbackToPage("/_Host");
-            });
+            app.UseDeveloperExceptionPage();
         }
+        else
+        {
+            app.UseExceptionHandler("/Error");
+            app.UseForwardedHeaders();
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            //app.UseHsts();
+        }
+
+        app.UseHttpsRedirection();
+        if (Configuration.GetDocsPath(out var _)) app.UseDefaultFiles();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        // app.ApplicationServices.UseMaterialProviders().UseMaterialIcons();
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+            endpoints.MapBlazorHub();
+            // endpoints.MapSchema("/schema");
+            endpoints.MapFallbackToPage("/_Host");
+        });
     }
 }

@@ -8,11 +8,11 @@
         <LayoutSiderContent>
             <Bar Breakpoint="Breakpoint.Desktop" NavigationBreakpoint="Breakpoint.Tablet" ThemeContrast="ThemeContrast.Dark"
                  Mode="BarMode.VerticalInline" CollapseMode="BarCollapseMode.Small">
-                <BarToggler />
+                <BarToggler/>
                 <BarBrand>
                     <BarItem>
                         <BarLink To="">
-                            <BarIcon IconName="MaterialIcons.Layers" />
+                            <BarIcon IconName="MaterialIcons.Layers"/>
                             @Brand.ProjectName
                         </BarLink>
                     </BarItem>
@@ -49,7 +49,7 @@
                         <BarItem>
                             <BarDropdown>
                                 <BarDropdownToggle>
-                                    <BarIcon IconName="IconName.Info" />
+                                    <BarIcon IconName="IconName.Info"/>
                                     About
                                 </BarDropdownToggle>
                                 <BarDropdownMenu>
@@ -72,7 +72,7 @@
                             </BarDropdown>
                         </BarItem>
                         <BarItem>
-                            <BarLoginDisplay />
+                            <BarLoginDisplay/>
                         </BarItem>
                     </BarEnd>
                 </BarMenu>
@@ -94,13 +94,13 @@
         <LayoutContent Padding="Padding.Is4.OnAll">
             <CascadingValue Value="@_snackbar" Name="SnackbarStack">
                 @Body
-                <SnackbarStack @ref="_snackbar" Interval="2000" Location="SnackbarStackLocation.Left"/>
+                <SnackbarStack @ref="_snackbar" Interval="2000" Location="SnackbarStackLocation.BottomStart"/>
             </CascadingValue>
         </LayoutContent>
     </Layout>
 </Layout>
 
 @code {
-    SnackbarStack _snackbar;
+    SnackbarStack? _snackbar;
 
 }

@@ -6,36 +6,22 @@ namespace SicarioPatch.Engine;
 
 public class SicarioMod : Mod
 {
-    [JsonPropertyName("_id")] 
-    public string Id { get; set; } = string.Empty;
-        
-    [JsonPropertyName("_sicario")] 
-    public SicarioMetadata ModInfo { get; set; } = new();
-
-    [JsonPropertyName("_vars")]
-    public Dictionary<string, string> Variables { get; set; } = new();
+    [JsonPropertyName("_id")] public string Id { get; set; } = string.Empty;
+    [JsonPropertyName("_sicario")] public SicarioMetadata ModInfo { get; set; } = new();
+    [JsonPropertyName("_vars")] public Dictionary<string, string> Variables { get; set; } = new();
 
     [JsonPropertyName("assetPatches")]
-    public Dictionary<string, List<PatchSet<Patch>>> AssetPatches { get; set; } =
-        new();
+    public Dictionary<string, List<PatchSet<Patch>>> AssetPatches { get; set; } = new();
 }
 
-public class SicarioMetadata
+public sealed class SicarioMetadata
 {
-    [JsonPropertyName("private")]
-    public bool Private { get; set; }
-        
-    [JsonPropertyName("overwrites")]
-    public bool CanOverwrite { get; set; }
-    [JsonPropertyName("group")]
-    public string Group { get; set; }
-        
-    [JsonPropertyName("preview")]
-    public bool Unstable { get; set; }
-    
+    [JsonPropertyName("private")] public bool Private { get; set; }
+    [JsonPropertyName("overwrites")] public bool CanOverwrite { get; set; }
+    [JsonPropertyName("group")] public string Group { get; set; }
+    [JsonPropertyName("preview")] public bool Unstable { get; set; }
 
     [JsonPropertyName("enableSteps")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Dictionary<string, string> StepsEnabled { get; set; } = new();
 }
-

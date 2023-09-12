@@ -2,28 +2,27 @@
 using Microsoft.Extensions.Configuration;
 using ModEngine.Templating;
 
-namespace SicarioPatch.App
+namespace SicarioPatch.App;
+
+public sealed class ConfigModelProvider : ITemplateModelProvider
 {
-    public class ConfigModelProvider : ITemplateModelProvider
+    public ConfigModelProvider(IConfiguration configuration)
     {
-        public ConfigModelProvider(IConfiguration configuration)
-        {
-            Section = configuration.GetSection("TemplateModels");
-        }
+        Section = configuration.GetSection("TemplateModels");
+    }
 
-        private IConfigurationSection Section { get; set; }
+    private IConfigurationSection Section { get; set; }
 
-        public IEnumerable<ITemplateModel> LoadModels()
-        {
-            if (Section.Exists())
+    public IEnumerable<ITemplateModel> LoadModels()
+    {
+        if (!Section.Exists()) yield break;
+
+        var keys = Section.GetChildren();
+        foreach (var modelKey in keys)
+            yield return new BasicTemplateModel
             {
-                var keys = Section.GetChildren();
-                foreach (var modelKey in keys)
-                {
-                    yield return new BasicTemplateModel()
-                        {Name = modelKey.Key, Values = modelKey.Get<Dictionary<string, string>>()};
-                }
-            }
-        }
+                Name = modelKey.Key,
+                Values = modelKey.Get<Dictionary<string, string>>() ?? new Dictionary<string, string>()
+            };
     }
 }

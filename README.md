@@ -1,5 +1,8 @@
 ﻿# Project Sicario
 
+> This is a *personal* version of Project Sicario. I made it to work on *my system*, not *all systems*.
+> User Discretion Is Advised.
+
 > An **experimental** new way of building and merging datatable mods for Project Wingman.
 
 The Sicario Patcher can attempt to "merge" multiple data table edits together into a single mod to improve compatibility and user choices. Underneath the fancy (terrible) UI, Project Sicario just uses [HexPatch](https://github.com/agc93/HexPatch) to apply a sequence of byte-level edits to any number of game files.

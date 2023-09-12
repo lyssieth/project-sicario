@@ -6,7 +6,7 @@
 
 <AuthorizeView>
     <Authorized>
-        Signed in as @context.User.Identity.Name
+        Signed in as @context.User.Identity?.Name
         <Button Clicked="@BeginSignOut">Log Out</Button>
     </Authorized>
     <NotAuthorized>
@@ -15,14 +15,17 @@
 </AuthorizeView>
 
 @code{
+
     private Task BeginSignOut()
     {
         Navigation.NavigateTo("/Logout");
         return Task.CompletedTask;
     }
 
-    private void BeginSignIn() {
+    private void BeginSignIn()
+    {
         @* await authStateProvider.Login(); *@
         Navigation.NavigateTo("/Login");
     }
+
 }

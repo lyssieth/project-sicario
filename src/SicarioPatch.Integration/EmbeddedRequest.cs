@@ -1,12 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using SicarioPatch.Core;
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace SicarioPatch.Integration
+namespace SicarioPatch.Integration;
+
+public sealed class EmbeddedRequest
 {
-    public class EmbeddedRequest
-    {
-        [JsonPropertyName("request")]
-        public PatchRequest? Request { get; set; }
-    }
+    [JsonPropertyName("request")] public PatchRequest? Request { get; set; }
 }

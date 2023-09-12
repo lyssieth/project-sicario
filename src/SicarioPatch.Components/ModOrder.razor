@@ -10,26 +10,33 @@
                         <Icon Name="IconName.ExclamationTriangle"/>
                     </FadeTooltip>
                 }
-                @if (enabledMod.FilePatches.Any()) {
+                @if (enabledMod.FilePatches.Any())
+                {
                     <FadeTooltip Text="This mod uses the legacy method of directly hex patching game files. Use with caution.">
-                        <Icon Name="IconName.ExclamationCircle" />
+                        <Icon Name="IconName.ExclamationCircle"/>
                     </FadeTooltip>
                 }
             </span>
-            <Tooltip Text="Use the priority to fine-tune the order your mods are applied" Placement="Placement.Left">
+            <Tooltip Text="Use the priority to fine-tune the order your mods are applied" Placement="TooltipPlacement.Left">
                 <Buttons>
-                    <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledMod, true)"><Icon Name="IconName.AngleUp" /></Button>
+                    <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledMod, true)">
+                        <Icon Name="IconName.AngleUp"/>
+                    </Button>
                     @* <Button Style="min-width: 48px;" Disabled="true" Color="Color.Dark"><Text Class="text-muted">@ModPriority[enabledFile]</Text></Button> *@
-                    <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledMod, false)"><Icon Name="IconName.AngleDown" /></Button>
+                    <Button Color="Color.Light" Clicked="() => OnChangePriority(enabledMod, false)">
+                        <Icon Name="IconName.AngleDown"/>
+                    </Button>
                 </Buttons>
             </Tooltip>
         </li>
     }
 </ul>
+
 @code {
+
     [Parameter]
     public EventCallback<List<WingmanMod>> OrderChanged { get; set; }
-    
+
     [Parameter]
     public List<WingmanMod> Order
     {
@@ -41,22 +48,22 @@
             OrderChanged.InvokeAsync(value);
         }
     }
-    
+
     //private Dictionary<WingmanMod, int> _order { get; set; }
 
-    private List<WingmanMod> _mods { get; set; } = new List<WingmanMod>();
-    
+    private List<WingmanMod> _mods { get; set; } = new();
+
     private void OnChangePriority(WingmanMod mod, bool decrement)
     {
         if (decrement)
         {
-            _mods.Move(mod, _mods.IndexOf(mod) -1);
+            _mods.Move(mod, _mods.IndexOf(mod) - 1);
         }
         else
         {
             _mods.Move(mod, _mods.IndexOf(mod) + 1);
         }
-        /*var existingPriority = _order[mod];
+    /*var existingPriority = _order[mod];
         if (decrement)
         {
             existingPriority--;
@@ -68,4 +75,5 @@
         _order[mod] = existingPriority;*/
         StateHasChanged();
     }
+
 }

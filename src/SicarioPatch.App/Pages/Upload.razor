@@ -1,9 +1,7 @@
 ﻿@page "/upload"
 @using System.IO
-@using Microsoft.Extensions.Configuration
 @using SicarioPatch.App.Infrastructure
 @inject IMediator Mediator
-@inject IJSRuntime JsRuntime
 @inject IConfiguration Configuration
 @inject BrandProvider Brand
 @attribute [Authorize(Policy = Policies.IsUploader)]
@@ -11,7 +9,8 @@
 
 <Row>
     <Column>
-        @if (!_uploadPublic) {
+        @if (!_uploadPublic)
+        {
             <div role="alert" class="alert alert-primary">
                 <h6 class="text-secondary">
                     All uploaded mods are private by default!
@@ -23,67 +22,72 @@
                     You will need to contact @Brand.OwnerName to make your mod available for other users.
                 </p>
             </div>
-            }
+        }
         <UploadMod OnSaveMod="@OnSaveMod"/>
     </Column>
     <Column ColumnSize="ColumnSize.IsAuto">
-        <UserMods Title="Your Mods" OnRemoveMod="@OnDeleteMod" />
+        <UserMods Title="Your Mods" OnRemoveMod="@OnDeleteMod"/>
     </Column>
 </Row>
 
 
 @code {
+
     [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private Task<AuthenticationState?>? AuthenticationStateTask { get; set; }
 
-    [CascadingParameter(Name = "SnackbarStack")] SnackbarStack snackbarStack { get; set; }
+    [CascadingParameter(Name = "SnackbarStack")]
+    SnackbarStack? SnackbarStack { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        // await RefreshMods();
-        var uploadPublic = Configuration.GetValue<bool>("UploadPublic", false);
+    // await RefreshMods();
+        var uploadPublic = Configuration.GetValue("UploadPublic", false);
         _uploadPublic = uploadPublic;
+        return Task.CompletedTask;
     }
 
     private async Task OnSaveMod((string fileName, WingmanMod mod) evt)
     {
-        var state = await authenticationStateTask;
+        if (AuthenticationStateTask == null) return;
+
+        var state = await AuthenticationStateTask;
         if (state?.User != null)
         {
-            evt.mod.Metadata.Author = state.User.Identity.Name;
+            if (evt.mod.Metadata != null) evt.mod.Metadata.Author = state.User.Identity?.Name;
+
             evt.mod.ModInfo.Private = !_uploadPublic;
-            var req = new ModUploadRequest { Mod = evt.mod, FileName = evt.fileName};
+            var req = new ModUploadRequest { Mod = evt.mod, FileName = evt.fileName };
             try
             {
                 Console.WriteLine("Sending upload request");
                 var result = await Mediator.Send(req);
                 if (!string.IsNullOrWhiteSpace(result))
                 {
-                    snackbarStack?.PushAsync($"Successfully uploaded '{Path.GetFileNameWithoutExtension(result)}'", SnackbarColor.Success);
+                    SnackbarStack?.PushAsync($"Successfully uploaded '{Path.GetFileNameWithoutExtension(result)}'", SnackbarColor.Success);
                 }
                 else
                 {
-                    snackbarStack?.PushAsync($"Error during upload! Please contact {Brand.OwnerName} to fix your upload", SnackbarColor.Warning);
+                    SnackbarStack?.PushAsync($"Error during upload! Please contact {Brand.OwnerName} to fix your upload", SnackbarColor.Warning);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                snackbarStack?.PushAsync($"Error encountered during upload!{Environment.NewLine}{e.ToString()}", SnackbarColor.Danger);
+                SnackbarStack?.PushAsync($"Error encountered during upload!{Environment.NewLine}{e}", SnackbarColor.Danger);
             }
         }
         else
         {
-            snackbarStack?.PushAsync("Failed to determine user information!", SnackbarColor.Danger);
+            SnackbarStack?.PushAsync("Failed to determine user information!", SnackbarColor.Danger);
         }
-        
     }
-    
+
     private async Task OnDeleteMod(string fileName)
     {
-        var req = new ModDeleteRequest{FileName = Path.GetFileName(fileName)};
+        var req = new ModDeleteRequest { FileName = Path.GetFileName(fileName) };
         var result = await Mediator.Send(req);
-        snackbarStack?.PushAsync(
+        SnackbarStack?.PushAsync(
             result ? $"Successfully deleted '{fileName}'" : "Failed to delete mod file",
             result ? SnackbarColor.Success : SnackbarColor.Danger);
     }

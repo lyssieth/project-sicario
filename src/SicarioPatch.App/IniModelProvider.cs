@@ -1,38 +1,31 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using IniParser;
+using INIParser;
 using Microsoft.Extensions.Configuration;
 using ModEngine.Templating;
-using SicarioPatch.Templating;
 
-namespace SicarioPatch.App
+namespace SicarioPatch.App;
+
+public sealed class IniModelProvider : ITemplateModelProvider
 {
-    public class IniModelProvider : ITemplateModelProvider
+    public IniModelProvider(IConfiguration configuration)
     {
-        public IniModelProvider(IConfiguration configuration)
-        {
-            FileName = configuration.GetValue<string>("TemplateModelsFile", string.Empty);
-        }
+        FileName = configuration.GetValue("TemplateModelsFile", string.Empty);
+    }
 
-        public string FileName { get; set; }
+    private string? FileName { get; }
 
-        public IEnumerable<ITemplateModel> LoadModels()
-        {
-            
-            if (!string.IsNullOrWhiteSpace(FileName) && new FileInfo(FileName) is var fi && fi.Exists)
+    public IEnumerable<ITemplateModel> LoadModels()
+    {
+        if (string.IsNullOrWhiteSpace(FileName) || new FileInfo(FileName) is not { Exists: true }) yield break;
+
+        var file = new IniFile(FileName);
+        foreach (var (section, keys) in file.Sections.Select(v => (v, file.GetKeys(v))))
+            yield return new BasicTemplateModel
             {
-                var parser = new FileIniDataParser();
-                var data = parser.ReadFile(fi.FullName);
-                foreach (var section in data.Sections)
-                {
-                    yield return new BasicTemplateModel()
-                    {
-                        Name = section.SectionName, 
-                        Values = section.Keys.ToDictionary(k => k.KeyName, v => v.Value)
-                    };
-                }
-            }
-        }
+                Name = section,
+                Values = keys.ToDictionary(static k => k, v => file[section, v] ?? string.Empty)
+            };
     }
 }

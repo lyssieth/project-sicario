@@ -1,8 +1,9 @@
 ﻿@page "/test"
 @using System.Timers
 @inject ModParser ModParser;
-@inject IMediator Mediator
 @using BlazorMonaco
+@using BlazorMonaco.Editor
+@using Environment = System.Environment
 @attribute [Authorize(Policy = Policies.IsUser)]
 <div class="test-container">
     <div class="test-header-row">
@@ -15,21 +16,25 @@
     </div>
     <div class="test-body-row">
         <div class="test-editor-container">
-            <MonacoEditor Id="test-editor" CssClass="test-editor" ConstructionOptions="GetEditorOptions" @ref="_editor" OnDidInit="OnEditorInit" OnKeyUp="HandleKeyUp"/>
+            <StandaloneCodeEditor Id="test-editor" CssClass="test-editor" ConstructionOptions="GetEditorOptions" @ref="_editor" OnDidInit="OnEditorInit" OnKeyUp="HandleKeyUp"/>
         </div>
         <div class="test-body-details">
-            @if (ParsedMod == null && IsLoading) {
+            @if (ParsedMod == null && IsLoading)
+            {
                 <LoadingSpinner/>
             }
-            @if (!string.IsNullOrWhiteSpace(LastError)) {
+            @if (!string.IsNullOrWhiteSpace(LastError))
+            {
                 <div class="container action-container test-body-details-item">
                     <Alert Color="Color.Warning" Visible="true">
                         Error encountered loading mod: @LastError
                     </Alert>
                 </div>
             }
-            @if (ParsedMod != null) {
-                @if (ParsedMod.Parameters.Any()) {
+            @if (ParsedMod != null)
+            {
+                @if (ParsedMod.Parameters.Any())
+                {
                     <div class="test-body-details-item">
                         <Tabs SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
                             <Items>
@@ -45,10 +50,11 @@
                                 </TabPanel>
                             </Content>
                         </Tabs>
-                        
+
                     </div>
                 }
-                else {
+                else
+                {
                     <Card Class="test-body-details-item">
                         <CardBody>
                             <ModInfo Mod="@ParsedMod" ReadOnly="true"/>
@@ -57,7 +63,7 @@
                 }
 
                 <Card Class="test-body-details-item">
-                    <BuildAction Mods="@BuildSet" BuildParameters="@Parameters" />
+                    <BuildAction Mods="@BuildSet" BuildParameters="@Parameters"/>
                 </Card>
             }
         </div>
@@ -67,38 +73,41 @@
 @code {
 
     [CascadingParameter(Name = "SnackbarStack")]
-    SnackbarStack SnackbarStack { get; set; }
+    SnackbarStack? SnackbarStack { get; set; }
 
-    private string RawModFile { get; set; }
-    private WingmanMod ParsedMod { get; set; }
+    private string? RawModFile { get; set; }
+    private WingmanMod? ParsedMod { get; set; }
 
-    private string LastError { get; set; }
-    private Timer _timer;
+    private string? LastError { get; set; }
+    private Timer? _timer;
     private bool IsLoading { get; set; }
 
-    private List<WingmanMod> BuildSet => ParsedMod == null ? new List<WingmanMod>() : new List<WingmanMod> {ParsedMod};
+    private List<WingmanMod> BuildSet => ParsedMod == null ? new List<WingmanMod>() : new List<WingmanMod> { ParsedMod };
     private SafeDictionary<string, string> Parameters { get; set; } = new(string.Empty);
 
-    private StandaloneEditorConstructionOptions GetEditorOptions(MonacoEditor editor) {
-        return new() {
+    private StandaloneEditorConstructionOptions GetEditorOptions(Editor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
             AutomaticLayout = true,
-            AutoIndent = true,
+            AutoIndent = "true",
             Language = "json",
             Theme = "vs-dark"
         };
     }
-    
+
     string _selectedTab = "params";
 
-    private void OnSelectedTabChanged( string name )
+    private void OnSelectedTabChanged(string name)
     {
         _selectedTab = name;
     }
 
-    protected override void OnInitialized() {
+    protected override void OnInitialized()
+    {
         base.OnInitialized();
         _timer = new Timer(750);
-        _timer.Elapsed += (source, evt) => OnLoadEditor();
+        _timer.Elapsed += async (_, _) => await OnLoadEditor();
         _timer.AutoReset = false;
     }
 
@@ -109,42 +118,52 @@
         aTimer.AutoReset = false;
     }*/
 
-    private async Task TryLoadMod() {
+    private async Task TryLoadMod()
+    {
         IsLoading = true;
         LastError = string.Empty;
         if (string.IsNullOrWhiteSpace(RawModFile)) return;
-        try {
-            if (await Task.Run(() => ModParser.ParseMod(RawModFile)) is { } jsonMod && ModParser.IsValid(jsonMod)) {
+
+        try
+        {
+            if (await Task.Run(() => ModParser.ParseMod(RawModFile)) is { } jsonMod && ModParser.IsValid(jsonMod))
+            {
                 jsonMod.Metadata ??= new SetMetadata();
                 ParsedMod = jsonMod;
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             SnackbarStack?.PushAsync($"Failed to load mod file!{Environment.NewLine}{e.Message}", SnackbarColor.Danger);
             ParsedMod = null;
             LastError = e.Message;
         }
         IsLoading = false;
-        try {
+        try
+        {
             await InvokeAsync(StateHasChanged);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             Console.WriteLine(e);
         }
     }
 
-    private async Task OnLoadEditor() {
+    private async Task OnLoadEditor()
+    {
         ParsedMod = null;
         var rawText = await _editor.GetValue();
-        if (!string.IsNullOrWhiteSpace(rawText)) {
+        if (!string.IsNullOrWhiteSpace(rawText))
+        {
             RawModFile = rawText;
             await TryLoadMod();
         }
     }
 
-    private MonacoEditor _editor;
+    private StandaloneCodeEditor _editor = null!;
 
-    private void OnEditorInit(MonacoEditorBase obj) {
+    private void OnEditorInit()
+    {
         Console.WriteLine("Editor init running");
         var mod = new WingmanMod();
         var json = ModParser.ToJson(mod);
@@ -152,9 +171,10 @@
         _editor.SetValue(json);
     }
 
-    private void HandleKeyUp(KeyboardEvent obj) {
-        _timer.Stop();
-        _timer.Start();
+    private void HandleKeyUp(KeyboardEvent obj)
+    {
+        _timer?.Stop();
+        _timer?.Start();
     }
 
 }

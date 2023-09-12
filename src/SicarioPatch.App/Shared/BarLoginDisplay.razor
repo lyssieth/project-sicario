@@ -8,8 +8,8 @@
     <Authorized>
         <BarDropdown>
             <BarDropdownToggle>
-                <BarIcon IconName="IconName.Key" />
-                Signed in as @context.User.Identity.Name
+                <BarIcon IconName="IconName.Key"/>
+                Signed in as @context.User.Identity?.Name
             </BarDropdownToggle>
             <BarDropdownMenu>
                 <BarDropdownItem To="/Logout">
@@ -23,7 +23,7 @@
     </Authorized>
     <NotAuthorized>
         <BarLink To="/Login">
-            <BarIcon IconName="IconName.Key" />
+            <BarIcon IconName="IconName.Key"/>
             Log in with Discord
         </BarLink>
     </NotAuthorized>

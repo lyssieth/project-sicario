@@ -1,7 +1,6 @@
-﻿namespace SicarioPatch.Core
+﻿namespace SicarioPatch.Core;
+
+public interface IBuildLog
 {
-    public interface IBuildLog
-    {
-        void SaveRequest(PatchRequestSummary summary);
-    }
+    void SaveRequest(PatchRequestSummary summary);
 }

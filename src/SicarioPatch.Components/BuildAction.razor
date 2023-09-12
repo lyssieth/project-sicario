@@ -4,7 +4,9 @@
 @inject IBrandProvider Brand
 
 <Card>
-    <CardHeader><Text Color="TextColor.Muted">Ready to build your mod!</Text></CardHeader>
+    <CardHeader>
+        <Text Color="TextColor.Muted">Ready to build your mod!</Text>
+    </CardHeader>
     <AcceptTerms Mods="Mods" SkipTerms="@SkipTerms">
         <CardBody>
             <div class="action-container">
@@ -18,42 +20,54 @@
                 }
                 else
                 {
-                    @if (RequireAuth) {
+                    @if (RequireAuth)
+                    {
                         <AuthorizeView>
                             <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
                         </AuthorizeView>
                     }
-                    else {
+                    else
+                    {
                         <Check TValue="bool" @bind-Checked="@AutoPack">Automatically pack final mod</Check>
                     }
                     <div class="form-group" style="margin-top: 0.5em; width: 85%">
                         <label>Enter an (optional) file name</label>
-                        <input @bind="FileName" type="text" class="form-control" >
+                        <input @bind="FileName" type="text" class="form-control">
                     </div>
                 }
             </div>
         </CardBody>
         <CardFooter>
-            @if (!IsBuilding && (ResultFile is not {Exists: true }))
+            @if (!IsBuilding && ResultFile is not {Exists: true })
             {
-                @if (RequireAuth) {
+                @if (RequireAuth)
+                {
                     <AuthorizeView>
-                        <Authorized><Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button></Authorized>
-                        <NotAuthorized><Button Disabled="@true" Color="Color.Dark">Start Build</Button></NotAuthorized>
+                        <Authorized>
+                            <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
+                        </Authorized>
+                        <NotAuthorized>
+                            <Button Disabled="@true" Color="Color.Dark">Start Build</Button>
+                        </NotAuthorized>
                     </AuthorizeView>
-                    }
-                else {
+                }
+                else
+                {
                     <Button Clicked="@OnStartBuild" Color="Color.Primary">Start Build</Button>
                 }
                 <Button Clicked="@OnPresetBuild" Color="Color.Secondary">Save Preset</Button>
-                <Button Class="context-btn" Clicked="() => _modalRef.Show()"><Icon Name="IconName.QuestionCircle" /></Button>
+                <Button Class="context-btn" Clicked="() => _modalRef.Show()">
+                    <Icon Name="IconName.QuestionCircle"/>
+                </Button>
             }
             @if (ResultFile is {Exists: true })
             {
                 <FileDownload ResultFile="ResultFile" DeleteAfter="true">
                     Download Merged File
                 </FileDownload>
-                <Button Clicked="@(() => ResultFile.Delete())" Color="Color.Danger"><Icon Name="Blazorise.Icons.Material.MaterialIcons.Refresh" /></Button>
+                <Button Clicked="@(() => ResultFile.Delete())" Color="Color.Danger">
+                    <Icon Name="Blazorise.Icons.Material.MaterialIcons.Refresh"/>
+                </Button>
             }
         </CardFooter>
     </AcceptTerms>
@@ -63,10 +77,10 @@
     <ModalContent IsCentered="true">
         <ModalHeader>
             <ModalTitle>Merged Mod or Preset?</ModalTitle>
-            <CloseButton Clicked="() => _modalRef.Hide()" />
+            <CloseButton Clicked="() => _modalRef.Hide()"/>
         </ModalHeader>
         <ModalBody>
-            <PresetGuide IncludeIntro="false" />
+            <PresetGuide IncludeIntro="false"/>
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Secondary" Clicked="@(() => _modalRef.Hide())">Close</Button>
@@ -75,24 +89,24 @@
 </Modal>
 
 @code {
-    
-    private bool AutoPack {get;set;} = true;
+
+    private bool AutoPack { get; set; } = true;
     private bool IsBuilding { get; set; }
     private FileInfo ResultFile { get; set; }
     private string FileName { get; set; } = string.Empty;
-    
-    [CascadingParameter(Name = "SnackbarStack")] 
+
+    [CascadingParameter(Name = "SnackbarStack")]
     SnackbarStack snackbarStack { get; set; }
 
     [Parameter]
-    public Dictionary<string, string> BuildParameters { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> BuildParameters { get; set; } = new();
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     [Parameter]
-    public List<WingmanMod> Mods { get; set; } = new List<WingmanMod>();
-    
+    public List<WingmanMod> Mods { get; set; } = new();
+
     [Parameter]
     public bool SkipTerms { get; set; }
 
@@ -109,34 +123,39 @@
         var state = await authenticationStateTask;
         var req = new PatchRequest(Mods.ToList())
         {
-            PackResult = AutoPack, 
-            TemplateInputs = inputParams.ToDictionary(), 
+            Id = string.Empty,
+            PackResult = AutoPack,
+            TemplateInputs = inputParams.ToDictionary(),
             Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName,
             UserName = state?.User?.Identity?.Name
         };
         snackbarStack?.PushAsync("Queueing mod build!", SnackbarColor.Success);
-        this.IsBuilding = true;
+        IsBuilding = true;
         timer.Start();
-        try {
-            // var buildResult = await RequestProvider.BuildMod(Mods.ToList(), inputParams.ToDictionary(), new ModBuildOptions { PackResult = AutoPack, Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName, UserIdentifier = state?.User?.Identity?.Name });
+        try
+        {
+    // var buildResult = await RequestProvider.BuildMod(Mods.ToList(), inputParams.ToDictionary(), new ModBuildOptions { PackResult = AutoPack, Name = string.IsNullOrWhiteSpace(FileName) ? null : FileName, UserIdentifier = state?.User?.Identity?.Name });
             var buildResult = await Mediator.Send(req);
             ResultFile = buildResult;
-            if (timer.Elapsed.TotalSeconds > 1) {
+            if (timer.Elapsed.TotalSeconds > 1)
+            {
                 snackbarStack?.PushAsync("Merged file successfully built!", SnackbarColor.Success);
             }
-
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             snackbarStack?.PushAsync("Error while building merged file!", SnackbarColor.Danger);
             snackbarStack?.PushAsync($"Error: {e.Message}", SnackbarColor.Danger);
         }
-        finally {
+        finally
+        {
             timer.Stop();
             IsBuilding = false;
         }
     }
 
-    private async Task OnPresetBuild() {
+    private async Task OnPresetBuild()
+    {
         var inputParams = BuildParameters.FallbackToDefaults(GetAllParameters().WhereValid());
         var req = new PresetFileRequest(Mods.ToList())
         {
@@ -144,16 +163,19 @@
             PresetName = string.IsNullOrWhiteSpace(FileName) ? null : FileName
         };
         snackbarStack?.PushAsync("Queued preset build!", SnackbarColor.Success);
-        this.IsBuilding = true;
-        try {
+        IsBuilding = true;
+        try
+        {
             var buildResult = await Mediator.Send(req);
             ResultFile = buildResult;
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             snackbarStack?.PushAsync("Error while building preset file!", SnackbarColor.Danger);
             snackbarStack?.PushAsync($"Error: {e.Message}", SnackbarColor.Danger);
         }
-        finally {
+        finally
+        {
             IsBuilding = false;
         }
     }

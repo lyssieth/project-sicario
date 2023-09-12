@@ -3,10 +3,9 @@ using MediatR;
 using ModEngine.Merge;
 using SicarioPatch.Core;
 
-namespace SicarioPatch.Loader
+namespace SicarioPatch.Loader;
+
+public sealed class MergeComponentRequest : IRequest<IEnumerable<MergeComponent<WingmanMod>>>
 {
-    public class MergeComponentRequest : IRequest<IEnumerable<MergeComponent<WingmanMod>>>
-    {
-        public List<string>? SearchPaths { get; init; }
-    }
+    internal List<string>? SearchPaths { get; init; }
 }

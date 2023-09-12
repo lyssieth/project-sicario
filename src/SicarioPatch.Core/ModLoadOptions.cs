@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
-namespace SicarioPatch.Core
+namespace SicarioPatch.Core;
+
+[PublicAPI]
+public sealed class ModLoadOptions
 {
-    public class ModLoadOptions
-    {
-        public List<string> Sources { get; set; } = new List<string>();
-        public string Filter { get; set; } = "*.dtm";
-    }
+    public List<string> Sources { get; set; } = new();
+    public string Filter { get; set; } = "*.dtm";
 }
