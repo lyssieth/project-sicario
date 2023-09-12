@@ -3,4 +3,4 @@
 	url = https://github.com/google/docsy.git
 [submodule "lib/UAssetAPI"]
 	path = lib/UAssetAPI
-	url = https://github.com/agc93/UAssetAPI.git
+	url = https://github.com/lyssieth/UAssetAPI.git
